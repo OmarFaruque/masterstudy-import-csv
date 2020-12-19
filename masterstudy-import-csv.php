@@ -13,7 +13,7 @@
  * WC tested up to: 4.7.0
  */
 
-define('MICSV_TOKEN', 'master-study');
+define('MICSV_TOKEN', 'masterstudy');
 define('MICSV_VERSION', '1.0.0');
 define('MICSV_FILE', __FILE__);
 define('MICSV_PLUGIN_NAME', 'MasterStudy Import CSV');

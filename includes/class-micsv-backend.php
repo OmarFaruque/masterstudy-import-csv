@@ -105,8 +105,8 @@ class MICSV_Backend
      */
     public function __construct($file = '')
     {
-        $this->version = ACOTRS_VERSION;
-        $this->token = ACOTRS_TOKEN;
+        $this->version = MICSV_VERSION;
+        $this->token = MICSV_TOKEN;
         $this->file = $file;
         $this->dir = dirname($this->file);
         $this->assets_dir = trailingslashit($this->dir) . 'assets';
@@ -131,6 +131,9 @@ class MICSV_Backend
         // enqueue scripts & styles.
         add_action('admin_enqueue_scripts', array($this, 'adminEnqueueScripts'), 10, 1);
         add_action('admin_enqueue_scripts', array($this, 'adminEnqueueStyles'), 10, 1);
+
+        // Admin notice if MasterStudy in inactive 
+        add_action('admin_notices', array($this, 'noticeNeedMasterStudy'));
     }
 
     /**
@@ -204,16 +207,19 @@ class MICSV_Backend
      * @access  public
      * @return void Fallack notice.
      */
-    public function noticeNeedWoocommerce()
+    public function noticeNeedMasterStudy()
     {
+        if (in_array('masterstudy-lms-learning-management-system/masterstudy-lms-learning-management-system.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            return true;
+        }
 
         $error = sprintf(
         /* translators: %s: Plugin Name. */
             __(
-                '%s requires <a href="http://wordpress.org/extend/plugins/woocommerce/">WooCommerce</a> to be installed & activated!',
+                '%s requires <a href="https://wordpress.org/plugins/masterstudy-lms-learning-management-system/">MasterStudy LMS – WordPress Course Plugin</a> to be installed & activated!',
                 'acowebs-plugin-boiler-plate-text-domain'
             ),
-            ACOTRS_PLUGIN_NAME
+            MICSV_PLUGIN_NAME
         );
 
         echo ('<div class="error"><p>' . $error . '</p></div>');

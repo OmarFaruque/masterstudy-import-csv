@@ -59,8 +59,8 @@ class MICSV_Public
      */
     public function __construct($file = '')
     {
-        $this->version = ACOTRS_VERSION;
-        $this->token = ACOTRS_TOKEN;
+        $this->version = MICSV_VERSION;
+        $this->token = MICSV_TOKEN;
         $this->file = $file;
         $this->assets_url = esc_url(trailingslashit(plugins_url('/assets/', $this->file)));
         // Load frontend CSS.

@@ -34,7 +34,7 @@ class MICSV_Api
 
     public function __construct()
     {
-        $this->token = ACOTRS_TOKEN;
+        $this->token = MICSV_TOKEN;
 
         add_action(
             'rest_api_init',
