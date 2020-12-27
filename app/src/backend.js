@@ -8,7 +8,7 @@ import General from "./pages/General";
 
 import Page2 from "./pages/Page2";
 
-import Tabs from "./components/Tabs";
+import Tabs from "./components/Tabs/Index";
 
 
 class App extends React.Component {
@@ -20,15 +20,23 @@ class App extends React.Component {
             config: {
                 general: {title: ''},
                 page2: {title: ''}
-            }
+            }, 
+            csv_data: false
         }
 
         this.fetchWP = new FetchWP({
-            restURL: window.acotrs_object.root,
-            restNonce: window.acotrs_object.api_nonce,
+            restURL: window.masterstudy_object.root,
+            restNonce: window.masterstudy_object.api_nonce,
 
         });
 
+    }
+
+
+    csvUploadHandler = (data, fileInfo) => {
+        this.setState({
+            csv_data: data
+        })
     }
 
 
@@ -41,9 +49,13 @@ class App extends React.Component {
 
     }
 
-    handleUpdate(conf) {
-
-        this.setState({conf});
+    handleUpdate = () => {
+        const {csv_data} = this.state;
+        this.fetchWP.post('save', {'data': csv_data}).then(json => {
+            console.log(json);
+        }).catch(error => {
+            alert("Some thing went wrong");
+        })
     }
 
     SaveChanges = () => {
@@ -85,16 +97,14 @@ class App extends React.Component {
                             path="/"
                             exact
                             render={props =>
-                                <General config={config} handleUpdate={this.handleUpdate}/>
+                                <General 
+                                    config={config} 
+                                    handleUpdate={this.handleUpdate}
+                                    csvUploadHandler={this.csvUploadHandler}
+                                />
                             }
                         />
-                        <Route
-                            exact
-                            path="/page2"
-                            render={props =>
-                                <Page2/>
-                            }
-                        />
+                        
                     </Switch>
                 </HashRouter>
 
@@ -106,7 +116,7 @@ class App extends React.Component {
 }
 
 
-if (document.getElementById("acotrs_ui_root")) {
-    ReactDOM.render(<App/>, document.getElementById("acotrs_ui_root"));
+if (document.getElementById("masterstudy_ui_root")) {
+    ReactDOM.render(<App/>, document.getElementById("masterstudy_ui_root"));
 }
 

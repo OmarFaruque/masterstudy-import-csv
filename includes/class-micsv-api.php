@@ -48,8 +48,66 @@ class MICSV_Api
                         'permission_callback' => array($this, 'getPermission'),
                     )
                 );
+
+
+                // CSV save route
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/save/',
+                    array(
+                        'methods' => 'POST',
+                        'callback' => array($this, 'saveCSVCallback'),
+                        'permission_callback' => array($this, 'getPermission'),
+                    )
+                );
+
+
             }
         );
+    }
+
+
+    public function create_post($title, $type, $content=''){
+        $existing_post = get_page_by_title($title, OBJECT, $type); 
+        $postid = isset($existing_post->ID) ? $existing_post->ID : '';
+        if(!$existing_post){
+            $postid = wp_insert_post(
+                array(
+                    'post_title' => $title, 
+                    'post_status'   => 'publish',
+                    'post_type' => $type, 
+                    'post_content' => $content
+                )
+            );
+        }
+
+        return $postid;
+    }
+
+
+    public function saveCSVCallback($data){
+        $counter = 0;
+        foreach($data['data'] as $sdata):
+            if($counter != 0 ){
+                // Course
+                $course_id = $this->create_post($sdata[25], 'stm-courses');
+                
+                // Quiz
+                $quiz_id = $this->create_post($sdata[19], 'stm-quizzes', $sdata[20]);
+
+                // Questions
+                $question_id = $this->create_post($sdata[1], 'stm-questions');
+
+            } 
+            $counter +=1;
+        endforeach;
+
+        $config = ['general' =>
+            [
+                'data' => $data['data']
+            ]
+        ];
+        return new WP_REST_Response($config, 200);
     }
 
     public function getConfig()

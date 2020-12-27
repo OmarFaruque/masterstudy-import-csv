@@ -170,25 +170,6 @@ class MICSV_Backend
         return array_merge($action_links, $links);
     }
 
-    /**
-     * Check if woocommerce is activated
-     *
-     * @access  public
-     * @return  boolean woocommerce install status
-     */
-    public function isWoocommerceActivated()
-    {
-        if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-            return true;
-        }
-        if (is_multisite()) {
-            $plugins = get_site_option('active_sitewide_plugins');
-            if (isset($plugins['woocommerce/woocommerce.php'])) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Installation. Runs on activation.
@@ -230,13 +211,14 @@ class MICSV_Backend
      */
     public function registerRootPage()
     {
-        $this->hook_suffix[] = add_submenu_page(
-            'woocommerce',
-            __('Acowebs', 'acowebs-plugin-boiler-plate-text-domain'),
-            __('Acowebs', 'acowebs-plugin-boiler-plate-text-domain'),
-            'manage_woocommerce',
+        $this->hook_suffix[] = add_menu_page(
+            __('STM LMS CSV Import', 'acowebs-plugin-boiler-plate-text-domain'),
+            __('STM LMS CSV Import', 'acowebs-plugin-boiler-plate-text-domain'),
+            'manage_options',
             $this->token . '-admin-ui',
-            array($this, 'adminUi')
+            array($this, 'adminUi'), 
+            'dashicons-media-spreadsheet', 
+            8
         );
     }
 
@@ -281,6 +263,8 @@ class MICSV_Backend
         }
 
         $screen = get_current_screen();
+
+        
 
         if (in_array($screen->id, $this->hook_suffix, true)) {
             // Enqueue WordPress media scripts.

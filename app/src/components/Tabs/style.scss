@@ -3,8 +3,21 @@
 }
 .wrap{
 
-  ul>li{
-    display:inline-block;
-    margin: 6px;
+  ul{
+    margin: 0;
+    li{
+      display:inline-block;
+      margin: 6px;
+      margin-bottom: 0;
+      margin-left: 0;
+      a{
+        text-decoration: none;
+        padding: 20px;
+        line-height: 0;
+        border-radius: 5px 5px 0px 0px;
+        display: inline-block;
+        background-color: white;
+      }
+  }
   }
 }

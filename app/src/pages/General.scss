@@ -1,5 +1,23 @@
 .test_class{
-  width: 900px;
-  height: 100px;
-  background: #ffad4e;
+  width: 60%;
+  padding: 40px;
+  border-radius: 5px;
+  background: white;
+  .uploader{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    input{
+      border: 1px solid #5b9dd9;
+      border-radius: 5px;
+      padding: 10px;
+    }
+  }
+  button{
+    border-width: 0;
+    background-color: #00a0d2;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+  }
 }
