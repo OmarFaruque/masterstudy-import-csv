@@ -2,7 +2,17 @@ import React from 'react';
 import style from './textinput.scss';
 
 export default function TextInput(props) {
-  const { label,customClass, name, type, value, placeholder, min, onChange } = props;
+  const { label,customClass, name, type, value, placeholder, min, onChange, options } = props;
+
+  
+  const items = [];
+  if(typeof options == 'object'){
+      Object.keys(options).forEach(function(k, v){
+        items.push(<option key={v} value={k}>{options[k]}</option>);  
+      });
+  }
+  
+
 
   return (
     <div className={style.form_group}>
@@ -56,6 +66,27 @@ export default function TextInput(props) {
           placeholder={placeholder}
         />
       )}
+      {type === 'select' && (
+        <select
+        className={
+          customClass
+            ? `${customClass} ${style.form_control}`
+            : style.form_control
+        }
+
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        >
+           {items.map(function(object, key){
+              return(
+                object
+              )
+          })} 
+        </select>
+      )}
+
       {type === 'text' && (
         <input
           className={

@@ -3,10 +3,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-makepot\n"
 
-#: src/pages/General.js:15
+#: src/pages/General.js:25
+msgid "Select Question Type"
+msgstr ""
+
+#: src/pages/General.js:31
 msgid "Select a CSV file"
 msgstr ""
 
-#: src/pages/General.js:19
+#: src/pages/General.js:36
 msgid "Process  CSV"
 msgstr ""

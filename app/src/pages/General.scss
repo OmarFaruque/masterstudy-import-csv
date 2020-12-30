@@ -3,6 +3,12 @@
   padding: 40px;
   border-radius: 5px;
   background: white;
+  .form_froup{
+    margin-bottom: 10px;
+    select{
+      width: 100%;
+    }
+  }
   .uploader{
     margin-top: 10px;
     margin-bottom: 10px;

@@ -285,6 +285,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _textinput_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./textinput.scss */ "./src/components/TextInput/textinput.scss");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 
 
 function TextInput(props) {
@@ -295,7 +297,19 @@ function TextInput(props) {
       value = props.value,
       placeholder = props.placeholder,
       min = props.min,
-      onChange = props.onChange;
+      onChange = props.onChange,
+      options = props.options;
+  var items = [];
+
+  if (_typeof(options) == 'object') {
+    Object.keys(options).forEach(function (k, v) {
+      items.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
+        key: v,
+        value: k
+      }, options[k]));
+    });
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: _textinput_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_group
   }, label && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", {
@@ -325,7 +339,15 @@ function TextInput(props) {
     value: value,
     onChange: onChange,
     placeholder: placeholder
-  }), type === 'text' && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
+  }), type === 'select' && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("select", {
+    className: customClass ? "".concat(customClass, " ").concat(_textinput_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_control) : _textinput_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_control,
+    id: name,
+    name: name,
+    value: value,
+    onChange: onChange
+  }, items.map(function (object, key) {
+    return object;
+  })), type === 'text' && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("input", {
     className: customClass ? "".concat(customClass, " ").concat(_textinput_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_control) : _textinput_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_control,
     id: name,
     name: name,
@@ -363,9 +385,18 @@ function General(props) {
   var config = props.config;
   var general = config.general;
   var title = general.title;
+  var options = {
+    'single_choice_question': 'Single Choice Question',
+    'item_match_question': 'Item Match Question'
+  };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.test_class
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, __('Select a CSV file', 'acowebs-plugin-boiler-plate-text-domain')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_froup
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, __('Select Question Type', 'masterstudy-import-csv')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_TextInput__WEBPACK_IMPORTED_MODULE_3__.default, {
+    type: "select",
+    options: options
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, __('Select a CSV file', 'masterstudy-import-csv')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.uploader
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement((react_csv_reader__WEBPACK_IMPORTED_MODULE_2___default()), {
     onFileLoaded: props.csvUploadHandler
@@ -1819,7 +1850,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"test_class":"acotrs_test_class1I3nr","uploader":"acotrs_uploader1mT9G"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"test_class":"acotrs_test_class1I3nr","form_froup":"acotrs_form_froup3iR5b","uploader":"acotrs_uploader1mT9G"});
 
 /***/ }),
 
