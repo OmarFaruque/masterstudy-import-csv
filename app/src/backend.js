@@ -21,7 +21,8 @@ class App extends React.Component {
                 general: {title: ''},
                 page2: {title: ''}
             }, 
-            csv_data: false
+            csv_data: false, 
+            type: 'single_choice_question'
         }
 
         this.fetchWP = new FetchWP({
@@ -29,9 +30,16 @@ class App extends React.Component {
             restNonce: window.masterstudy_object.api_nonce,
 
         });
-
+        
+        this.onChangeHandler = this.onChangeHandler.bind(this);
     }
 
+
+    onChangeHandler = (e) => {
+        this.setState({
+            type: e.target.value
+        });
+    }
 
     csvUploadHandler = (data, fileInfo) => {
         this.setState({
@@ -50,8 +58,9 @@ class App extends React.Component {
     }
 
     handleUpdate = () => {
-        const {csv_data} = this.state;
-        this.fetchWP.post('save', {'data': csv_data}).then(json => {
+        const {csv_data, type} = this.state;
+        
+        this.fetchWP.post('save', {data: csv_data, type:type}).then(json => {
             console.log(json);
         }).catch(error => {
             alert("Some thing went wrong");
@@ -100,6 +109,7 @@ class App extends React.Component {
                                 <General 
                                     config={config} 
                                     handleUpdate={this.handleUpdate}
+                                    onChangeHandler={this.onChangeHandler}
                                     csvUploadHandler={this.csvUploadHandler}
                                 />
                             }

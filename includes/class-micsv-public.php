@@ -68,12 +68,12 @@ class MICSV_Public
 
         add_action('init', array($this, 'init'));
 
-        // add_action('wp_head', array($this, 'testF'));
+        add_action('wp_head', array($this, 'testF'));
     }
 
 
     public function testF(){
-        $answers = get_post_meta( 69, 'answers', true );
+        $answers = get_post_meta( 149, 'answers', true );
         echo 'Answers <br/><pre>';
         print_r($answers);
         echo '</pre>';

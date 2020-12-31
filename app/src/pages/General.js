@@ -17,7 +17,8 @@ export default function General(props) {
 
     const options = {
         'single_choice_question': 'Single Choice Question', 
-        'item_match_question': 'Item Match Question'
+        'item_match_question': 'Item Match Question', 
+        'multi_choice': 'Multi Choice Question'
     }
     
     return (<div className={style.test_class}>
@@ -26,6 +27,7 @@ export default function General(props) {
             <TextInput
                 type="select"
                 options={options}
+                onChange={props.onChangeHandler}
             />
         </div>
         <label>{__('Select a CSV file','masterstudy-import-csv')}</label>

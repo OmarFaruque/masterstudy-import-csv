@@ -111,9 +111,222 @@ class MICSV_Api
 
 
     public function saveCSVCallback($data){
+        
+        switch($data['type']){
+            case "single_choice_question":
+                $this->process_single_choice_question($data['data']);
+            break;
+            case "item_match_question": 
+                $this->process_item_match_question($data['data']);
+            break;
+            case "multi_choice": 
+                // $this->process_multi_choice_question($data['data']);
+            break;
+        }
+       
+
+        $config = ['general' =>
+            [
+                'data' => $data['data']
+            ]
+        ];
+        return new WP_REST_Response($config, 200);
+    }
+
+
+    /**
+     * Process Multi Choice Question
+     * @param $data as array
+     */
+    public function process_multi_choice_question($data){
+        unset($data[0]);
+        foreach($data as $k => $sdata):
+            if(isset($sdata[25]) && $sdata[25] != ''){
+                // Course
+                $course_id = $this->create_post($sdata[25], 'stm-courses', '');
+                
+                // Quiz
+                $quiz_id = $this->create_post($sdata[19], 'stm-quizzes', $sdata[20]);
+
+                // Questions
+                $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+                
+                // Course Curriculum 
+                $curriculum = array(
+                    $sdata[26], 
+                    $sdata[27], 
+                    $quiz_id
+                );
+                $curriculum = implode(',', $curriculum);
+                update_post_meta( $course_id, 'curriculum', $curriculum );
+
+                // Quiz duration_measure
+                $duration_measure = ($sdata[24] == 'Minutes') ? '' : strtolower($sdata[24]);
+                update_post_meta( $quiz_id, 'duration_measure', $duration_measure );
+
+                // Quiz Duration 
+                $duration = (isset($sdata[23]) && $sdata[23] != '') ? $sdata[23] : 0;
+                update_post_meta( $quiz_id, 'duration', $sdata[23] );
+
+                // Process Quiz Featured image
+                if (filter_var($sdata[22], FILTER_VALIDATE_URL)) { 
+                    $this->Generate_Featured_Image($sdata[22], $quiz_id);
+                }else{
+                    set_post_thumbnail( $quiz_id, $sdata[22] );
+                }
+
+                // Quiz Front-end Description 
+                update_post_meta( $quiz_id, 'lesson_excerpt', $sdata[21] );
+
+                // Show Currect Answer or not (For yes "on" Empty for no)
+                $showCorrectAnswer = strtolower($sdata[15]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'correct_answer', $showCorrectAnswer );
+
+                // Passing Grade 
+                update_post_meta( $quiz_id, 'passing_grade', (int)$sdata[16] );
+
+                // Points total cut after re-take 
+                update_post_meta( $quiz_id, 're_take_cut', (int)$sdata[17] );
+
+                // Rendomize Question 
+                $rendomize_question = strtolower($sdata[18]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'random_questions', $rendomize_question );
+
+
+                // Set Question Type 
+                update_post_meta( $question_id, 'type', $sdata[0] );
+                
+                // Questin Category
+                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                if(!$q_cat){
+                    $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
+                }
+                $q_cat_id = $q_cat['term_id'];
+                wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
+
+                $answers = array();
+                $order = 1;
+                for($i = 4; $i <= 12; $i+=2){
+                    if(!empty($sdata[$i])){
+                        $correctAnswer = explode(',', $sdata[14]);
+                        $explanationIndex = $i + 1;
+                        $newArray = array(
+                            'text' => $sdata[$i], 
+                            'isTrue' => in_array($order, $correctAnswer) ? 1 : 0,
+                            'explain' => $sdata[$explanationIndex]
+                        );
+                        array_push($answers, $newArray);
+                    }
+                    $order += 1;
+                }
+
+                update_post_meta( $question_id, 'answers', $answers );
+
+            } 
+        endforeach;
+    }
+
+
+    /**
+     * Process Item Match Question
+     * @param $data as array
+     */
+    public function process_item_match_question($data = array()){
+        unset($data[0]);
+        foreach($data as $k => $sdata):
+            if(isset($sdata[29]) && $sdata[29] != ''){
+                // Course
+                $course_id = $this->create_post($sdata[29], 'stm-courses', '');
+                
+                // Quiz
+                $quiz_id = $this->create_post($sdata[23], 'stm-quizzes', $sdata[24]);
+
+                // Questions
+                $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+                
+                // Course Curriculum 
+                $curriculum = array(
+                    $sdata[30], 
+                    $sdata[31], 
+                    $quiz_id
+                );
+                $curriculum = implode(',', $curriculum);
+                update_post_meta( $course_id, 'curriculum', $curriculum );
+
+                // Quiz duration_measure
+                $duration_measure = ($sdata[28] == 'Minutes') ? '' : strtolower($sdata[28]);
+                update_post_meta( $quiz_id, 'duration_measure', $duration_measure );
+
+                // Quiz Duration 
+                $duration = (isset($sdata[27]) && $sdata[27] != '') ? $sdata[27] : 0;
+                update_post_meta( $quiz_id, 'duration', $sdata[23] );
+
+                // Process Quiz Featured image
+                if (filter_var($sdata[26], FILTER_VALIDATE_URL)) { 
+                    $this->Generate_Featured_Image($sdata[26], $quiz_id);
+                }else{
+                    set_post_thumbnail( $quiz_id, $sdata[26] );
+                }
+
+                // Quiz Front-end Description 
+                update_post_meta( $quiz_id, 'lesson_excerpt', $sdata[25] );
+
+                // Show Currect Answer or not (For yes "on" Empty for no)
+                $showCorrectAnswer = strtolower($sdata[19]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'correct_answer', $showCorrectAnswer );
+
+                // Passing Grade 
+                update_post_meta( $quiz_id, 'passing_grade', (int)$sdata[20] );
+
+                // Points total cut after re-take 
+                update_post_meta( $quiz_id, 're_take_cut', (int)$sdata[21] );
+
+                // Rendomize Question 
+                $rendomize_question = strtolower($sdata[22]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'random_questions', $rendomize_question );
+
+
+                // Set Question Type 
+                update_post_meta( $question_id, 'type', $sdata[0] );
+                
+                // Questin Category
+                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                if(!$q_cat){
+                    $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
+                }
+                $q_cat_id = $q_cat['term_id'];
+                wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
+
+                $answers = array();
+                for($i = 4; $i <= 16; $i+=3){
+                    if(!empty($sdata[$i])){
+                        $explanationIndex = $i + 2;
+                        $questionIndex = $i + 1;
+                        $newArray = array(
+                            'text' => $sdata[$i], 
+                            'isTrue' => 1,
+                            'explain' => $sdata[$explanationIndex]
+                        );
+                        if(!empty($sdata[$questionIndex])) $newArray['question'] =  $sdata[$questionIndex];
+                        array_push($answers, $newArray);
+                    }
+                }
+
+                update_post_meta( $question_id, 'answers', $answers );
+
+            } 
+        endforeach;
+    }
+
+
+    /**
+     * @param $data array
+     * Procee Single choice Question
+     *  
+     **/
+    public function process_single_choice_question($data = array()){
         $counter = 0;
-        $imgTypeArray = array();
-        foreach($data['data'] as $sdata):
+        foreach($data as $sdata):
             if($counter > 0 && isset($sdata[25]) && $sdata[25] != ''){
                 // Course
                 $course_id = $this->create_post($sdata[25], 'stm-courses', '');
@@ -130,7 +343,6 @@ class MICSV_Api
                     $sdata[27], 
                     $quiz_id
                 );
-                array_push($imgTypeArray, $counter);
                 $curriculum = implode(',', $curriculum);
                 update_post_meta( $course_id, 'curriculum', $curriculum );
 
@@ -198,14 +410,6 @@ class MICSV_Api
             } 
             $counter +=1;
         endforeach;
-
-        $config = ['general' =>
-            [
-                'data' => $data['data'], 
-                'counter' => $imgTypeArray
-            ]
-        ];
-        return new WP_REST_Response($config, 200);
     }
 
     public function getConfig()

@@ -139,6 +139,12 @@ var App = /*#__PURE__*/function (_React$Component) {
 
     _this = _super.call(this, props);
 
+    _defineProperty(_assertThisInitialized(_this), "onChangeHandler", function (e) {
+      _this.setState({
+        type: e.target.value
+      });
+    });
+
     _defineProperty(_assertThisInitialized(_this), "csvUploadHandler", function (data, fileInfo) {
       _this.setState({
         csv_data: data
@@ -146,10 +152,13 @@ var App = /*#__PURE__*/function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleUpdate", function () {
-      var csv_data = _this.state.csv_data;
+      var _this$state = _this.state,
+          csv_data = _this$state.csv_data,
+          type = _this$state.type;
 
       _this.fetchWP.post('save', {
-        'data': csv_data
+        data: csv_data,
+        type: type
       }).then(function (json) {
         console.log(json);
       })["catch"](function (error) {
@@ -178,12 +187,14 @@ var App = /*#__PURE__*/function (_React$Component) {
           title: ''
         }
       },
-      csv_data: false
+      csv_data: false,
+      type: 'single_choice_question'
     };
     _this.fetchWP = new _utils_fetchWP__WEBPACK_IMPORTED_MODULE_2__.default({
       restURL: window.masterstudy_object.root,
       restNonce: window.masterstudy_object.api_nonce
     });
+    _this.onChangeHandler = _this.onChangeHandler.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -223,6 +234,7 @@ var App = /*#__PURE__*/function (_React$Component) {
           return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_pages_General__WEBPACK_IMPORTED_MODULE_3__.default, {
             config: config,
             handleUpdate: _this3.handleUpdate,
+            onChangeHandler: _this3.onChangeHandler,
             csvUploadHandler: _this3.csvUploadHandler
           });
         }
@@ -387,7 +399,8 @@ function General(props) {
   var title = general.title;
   var options = {
     'single_choice_question': 'Single Choice Question',
-    'item_match_question': 'Item Match Question'
+    'item_match_question': 'Item Match Question',
+    'multi_choice': 'Multi Choice Question'
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.test_class
@@ -395,7 +408,8 @@ function General(props) {
     className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.form_froup
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, __('Select Question Type', 'masterstudy-import-csv')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_TextInput__WEBPACK_IMPORTED_MODULE_3__.default, {
     type: "select",
-    options: options
+    options: options,
+    onChange: props.onChangeHandler
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("label", null, __('Select a CSV file', 'masterstudy-import-csv')), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: _General_scss__WEBPACK_IMPORTED_MODULE_1__.default.uploader
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement((react_csv_reader__WEBPACK_IMPORTED_MODULE_2___default()), {
