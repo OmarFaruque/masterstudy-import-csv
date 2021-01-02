@@ -1,13 +1,39 @@
 .test_class{
-  width: 60%;
+  width: 100%;
   padding: 40px;
   border-radius: 5px;
+  display: flex;
+  >div{
+    flex: 1
+  }
+  .right_inner{
+   a{
+      display: block;
+      text-decoration: none;
+      padding: 10px;
+      margin: 13px 0;
+      border: 1px solid #5b9dd9;
+      max-width: 300px;
+      border-radius: 5px;
+      color: black;
+      text-align: center;
+   }   
+   a:hover{
+     color: white;
+     background-color: #5b9dd9;
+   }
+  }
+  
   background: white;
   .form_froup{
     margin-bottom: 10px;
     select{
       width: 100%;
     }
+  }
+  .msgS{
+    color: #5b9dd9;
+    padding: 10px 0;
   }
   .uploader{
     margin-top: 10px;

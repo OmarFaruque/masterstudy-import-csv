@@ -73,7 +73,7 @@ class MICSV_Public
 
 
     public function testF(){
-        $answers = get_post_meta( 149, 'answers', true );
+        $answers = get_post_meta( 162, 'answers', true );
         echo 'Answers <br/><pre>';
         print_r($answers);
         echo '</pre>';

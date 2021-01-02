@@ -6,9 +6,10 @@ import FetchWP from './utils/fetchWP';
 
 import General from "./pages/General";
 
-import Page2 from "./pages/Page2";
-
 import Tabs from "./components/Tabs/Index";
+
+import Csvloader from './utils/csvloader';
+
 
 
 class App extends React.Component {
@@ -22,7 +23,9 @@ class App extends React.Component {
                 page2: {title: ''}
             }, 
             csv_data: false, 
-            type: 'single_choice_question'
+            type: 'single_choice_question', 
+            assets_url: window.masterstudy_object.assets_url, 
+            upload_complete: false
         }
 
         this.fetchWP = new FetchWP({
@@ -58,10 +61,15 @@ class App extends React.Component {
     }
 
     handleUpdate = () => {
+        this.setState({
+            loader: true
+        });
         const {csv_data, type} = this.state;
-        
         this.fetchWP.post('save', {data: csv_data, type:type}).then(json => {
-            console.log(json);
+            this.setState({
+                loader: false, 
+                upload_complete: true
+            });
         }).catch(error => {
             alert("Some thing went wrong");
         })
@@ -99,6 +107,7 @@ class App extends React.Component {
         const {config} = this.state;
         return (
             <div>
+                {this.state.loader ? <Csvloader /> : null}
                 <HashRouter>
                     <Tabs/>
                     <Switch>
@@ -111,6 +120,8 @@ class App extends React.Component {
                                     handleUpdate={this.handleUpdate}
                                     onChangeHandler={this.onChangeHandler}
                                     csvUploadHandler={this.csvUploadHandler}
+                                    assets_url={this.state.assets_url}
+                                    upload_complete={this.state.upload_complete}
                                 />
                             }
                         />

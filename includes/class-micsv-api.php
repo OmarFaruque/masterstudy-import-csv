@@ -111,7 +111,6 @@ class MICSV_Api
 
 
     public function saveCSVCallback($data){
-        
         switch($data['type']){
             case "single_choice_question":
                 $this->process_single_choice_question($data['data']);
@@ -120,7 +119,10 @@ class MICSV_Api
                 $this->process_item_match_question($data['data']);
             break;
             case "multi_choice": 
-                // $this->process_multi_choice_question($data['data']);
+                $this->process_multi_choice_question($data['data']);
+            break;
+            case "fill_the_gaps":
+                $this->process_fill_the_gap_question($data['data']);
             break;
         }
        
@@ -131,6 +133,96 @@ class MICSV_Api
             ]
         ];
         return new WP_REST_Response($config, 200);
+    }
+
+
+
+    /**
+     * Process Fill the gap Question
+     * @param $data as array
+     */
+    public function process_fill_the_gap_question($data){
+        unset($data[0]);
+        foreach($data as $sdata):
+            if(isset($sdata[16]) && $sdata[16] != ''){
+                // Course
+                $course_id = $this->create_post($sdata[16], 'stm-courses', '');
+                
+                // Quiz
+                $quiz_id = $this->create_post($sdata[10], 'stm-quizzes', $sdata[11]);
+
+                // Questions
+                $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+                
+                // Course Curriculum 
+                $curriculum = array(
+                    $sdata[17], 
+                    $sdata[18], 
+                    $quiz_id
+                );
+                $curriculum = implode(',', $curriculum);
+                update_post_meta( $course_id, 'curriculum', $curriculum );
+
+                // Quiz duration_measure
+                $duration_measure = ($sdata[15] == 'Minutes') ? '' : strtolower($sdata[15]);
+                update_post_meta( $quiz_id, 'duration_measure', $duration_measure );
+
+                // Quiz Duration 
+                $duration = (isset($sdata[14]) && $sdata[14] != '') ? $sdata[14] : 0;
+                update_post_meta( $quiz_id, 'duration', $duration );
+
+                // Process Quiz Featured image
+                if (filter_var($sdata[13], FILTER_VALIDATE_URL)) { 
+                    $this->Generate_Featured_Image($sdata[13], $quiz_id);
+                }else{
+                    set_post_thumbnail( $quiz_id, $sdata[13] );
+                }
+
+                // Quiz Front-end Description 
+                update_post_meta( $quiz_id, 'lesson_excerpt', $sdata[12] );
+
+                // Show Currect Answer or not (For yes "on" Empty for no)
+                $showCorrectAnswer = strtolower($sdata[6]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'correct_answer', $showCorrectAnswer );
+
+                // Passing Grade 
+                update_post_meta( $quiz_id, 'passing_grade', (int)$sdata[7] );
+
+                // Points total cut after re-take 
+                update_post_meta( $quiz_id, 're_take_cut', (int)$sdata[8] );
+
+                // Rendomize Question 
+                $rendomize_question = strtolower($sdata[9]) == 'yes' ? 'on':'';
+                update_post_meta( $quiz_id, 'random_questions', $rendomize_question );
+
+
+                // Set Question Type 
+                update_post_meta( $question_id, 'type', $sdata[0] );
+                
+                // Questin Category
+                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                if(!$q_cat){
+                    $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
+                }
+                $q_cat_id = $q_cat['term_id'];
+                wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
+
+                $answers = array();
+               
+                        
+                        
+                $newArray = array(
+                            'text' => $sdata[4], 
+                            'isTrue' => 0
+                );
+                array_push($answers, $newArray);
+                   
+                update_post_meta( $question_id, 'answers', $answers );
+
+                if($sdata[5] && $sdata[5] != '') update_post_meta( $question_id, 'question_explanation', $sdata[5] );
+
+            } 
+        endforeach;
     }
 
 

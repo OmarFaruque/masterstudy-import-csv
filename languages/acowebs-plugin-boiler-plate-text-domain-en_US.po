@@ -3,14 +3,38 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-makepot\n"
 
-#: src/pages/General.js:26
+#: src/pages/General.js:29
 msgid "Select Question Type"
 msgstr ""
 
-#: src/pages/General.js:33
+#: src/pages/General.js:36
 msgid "Select a CSV file"
 msgstr ""
 
-#: src/pages/General.js:38
+#: src/pages/General.js:43
+msgid "CSV upload complete."
+msgstr ""
+
+#: src/pages/General.js:46
 msgid "Process  CSV"
+msgstr ""
+
+#: src/pages/General.js:53
+msgid "Download CSV Sample"
+msgstr ""
+
+#: src/pages/General.js:54
+msgid "Single Choice Question"
+msgstr ""
+
+#: src/pages/General.js:55
+msgid "Multi Choice Question"
+msgstr ""
+
+#: src/pages/General.js:56
+msgid "Item Match Question"
+msgstr ""
+
+#: src/pages/General.js:57
+msgid "Fill the Gap Question"
 msgstr ""
