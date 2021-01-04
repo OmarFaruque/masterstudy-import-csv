@@ -78,6 +78,7 @@ class MICSV_Api
             );
 
             if(!empty($content)) $postArray['post_content'] = $content;
+            
             $postid = wp_insert_post($postArray);
         }
 
@@ -144,24 +145,32 @@ class MICSV_Api
     public function process_fill_the_gap_question($data){
         unset($data[0]);
         foreach($data as $sdata):
-            if(isset($sdata[16]) && $sdata[16] != ''){
-                // Course
-                $course_id = $this->create_post($sdata[16], 'stm-courses', '');
-                
+                if(isset($sdata[16]) && $sdata[16] != ''){
+                    // Course
+                    $course_id = $this->create_post($sdata[16], 'stm-courses', '');
+                }
                 // Quiz
                 $quiz_id = $this->create_post($sdata[10], 'stm-quizzes', $sdata[11]);
 
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
                 
-                // Course Curriculum 
-                $curriculum = array(
-                    $sdata[17], 
-                    $sdata[18], 
-                    $quiz_id
-                );
-                $curriculum = implode(',', $curriculum);
-                update_post_meta( $course_id, 'curriculum', $curriculum );
+                if(isset($sdata[16]) && $sdata[16] != ''){
+                    // Course Curriculum 
+                    $curriculum = array(
+                        $sdata[17], 
+                        $sdata[18], 
+                        $quiz_id
+                    );
+                    $curriculum = implode(',', $curriculum);
+                    update_post_meta( $course_id, 'curriculum', $curriculum );
+                }
+
+                // Link Question to Quiz 
+                $quiz_questions = get_post_meta( $quiz_id, 'questions', true );
+                $quiz_questions = $quiz_questions ? explode(',', $quiz_questions) : array();
+                array_push($quiz_questions, $question_id);
+                update_post_meta( $quiz_id, 'questions', implode(',', $quiz_questions) );
 
                 // Quiz duration_measure
                 $duration_measure = ($sdata[15] == 'Minutes') ? '' : strtolower($sdata[15]);
@@ -200,11 +209,11 @@ class MICSV_Api
                 update_post_meta( $question_id, 'type', $sdata[0] );
                 
                 // Questin Category
-                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                $q_cat = get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
                 if(!$q_cat){
                     $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
                 }
-                $q_cat_id = $q_cat['term_id'];
+                $q_cat_id = $q_cat->term_id;
                 wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
 
                 $answers = array();
@@ -220,8 +229,6 @@ class MICSV_Api
                 update_post_meta( $question_id, 'answers', $answers );
 
                 if($sdata[5] && $sdata[5] != '') update_post_meta( $question_id, 'question_explanation', $sdata[5] );
-
-            } 
         endforeach;
     }
 
@@ -232,10 +239,11 @@ class MICSV_Api
      */
     public function process_multi_choice_question($data){
         unset($data[0]);
-        foreach($data as $k => $sdata):
-            if(isset($sdata[25]) && $sdata[25] != ''){
-                // Course
-                $course_id = $this->create_post($sdata[25], 'stm-courses', '');
+        foreach($data as $sdata):
+                if(isset($sdata[25]) && $sdata[25] != ''){
+                    // Course
+                    $course_id = $this->create_post($sdata[25], 'stm-courses', '');
+                }
                 
                 // Quiz
                 $quiz_id = $this->create_post($sdata[19], 'stm-quizzes', $sdata[20]);
@@ -243,14 +251,25 @@ class MICSV_Api
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
                 
-                // Course Curriculum 
-                $curriculum = array(
-                    $sdata[26], 
-                    $sdata[27], 
-                    $quiz_id
-                );
-                $curriculum = implode(',', $curriculum);
-                update_post_meta( $course_id, 'curriculum', $curriculum );
+
+                if(isset($sdata[25]) && $sdata[25] != ''){
+                    // Course Curriculum 
+                    $curriculum = array(
+                        $sdata[26], 
+                        $sdata[27], 
+                        $quiz_id
+                    );
+                    $curriculum = implode(',', $curriculum);
+                    update_post_meta( $course_id, 'curriculum', $curriculum );
+                }
+                
+                // Link Question to Quiz 
+                $quiz_questions = get_post_meta( $quiz_id, 'questions', true );
+                $quiz_questions = $quiz_questions ? explode(',', $quiz_questions) : array();
+                array_push($quiz_questions, $question_id);
+                update_post_meta( $quiz_id, 'questions', implode(',', $quiz_questions) );
+
+
 
                 // Quiz duration_measure
                 $duration_measure = ($sdata[24] == 'Minutes') ? '' : strtolower($sdata[24]);
@@ -289,11 +308,11 @@ class MICSV_Api
                 update_post_meta( $question_id, 'type', $sdata[0] );
                 
                 // Questin Category
-                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                $q_cat = get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
                 if(!$q_cat){
                     $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
                 }
-                $q_cat_id = $q_cat['term_id'];
+                $q_cat_id = $q_cat->term_id;
                 wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
 
                 $answers = array();
@@ -313,8 +332,6 @@ class MICSV_Api
                 }
 
                 update_post_meta( $question_id, 'answers', $answers );
-
-            } 
         endforeach;
     }
 
@@ -325,10 +342,11 @@ class MICSV_Api
      */
     public function process_item_match_question($data = array()){
         unset($data[0]);
-        foreach($data as $k => $sdata):
-            if(isset($sdata[29]) && $sdata[29] != ''){
-                // Course
-                $course_id = $this->create_post($sdata[29], 'stm-courses', '');
+        foreach($data as $sdata):
+                if(isset($sdata[29]) && $sdata[29] != ''){
+                    // Course
+                    $course_id = $this->create_post($sdata[29], 'stm-courses', '');
+                }
                 
                 // Quiz
                 $quiz_id = $this->create_post($sdata[23], 'stm-quizzes', $sdata[24]);
@@ -336,14 +354,22 @@ class MICSV_Api
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
                 
-                // Course Curriculum 
-                $curriculum = array(
-                    $sdata[30], 
-                    $sdata[31], 
-                    $quiz_id
-                );
-                $curriculum = implode(',', $curriculum);
-                update_post_meta( $course_id, 'curriculum', $curriculum );
+                if(isset($sdata[29]) && $sdata[29] != ''){
+                    // Course Curriculum 
+                    $curriculum = array(
+                        $sdata[30], 
+                        $sdata[31], 
+                        $quiz_id
+                    );
+                    $curriculum = implode(',', $curriculum);
+                    update_post_meta( $course_id, 'curriculum', $curriculum );
+                }
+
+                // Link Question to Quiz 
+                $quiz_questions = get_post_meta( $quiz_id, 'questions', true );
+                $quiz_questions = $quiz_questions ? explode(',', $quiz_questions) : array();
+                array_push($quiz_questions, $question_id);
+                update_post_meta( $quiz_id, 'questions', implode(',', $quiz_questions) );
 
                 // Quiz duration_measure
                 $duration_measure = ($sdata[28] == 'Minutes') ? '' : strtolower($sdata[28]);
@@ -382,11 +408,11 @@ class MICSV_Api
                 update_post_meta( $question_id, 'type', $sdata[0] );
                 
                 // Questin Category
-                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                $q_cat = get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
                 if(!$q_cat){
                     $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
                 }
-                $q_cat_id = $q_cat['term_id'];
+                $q_cat_id = $q_cat->term_id;
                 wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
 
                 $answers = array();
@@ -405,8 +431,6 @@ class MICSV_Api
                 }
 
                 update_post_meta( $question_id, 'answers', $answers );
-
-            } 
         endforeach;
     }
 
@@ -417,11 +441,12 @@ class MICSV_Api
      *  
      **/
     public function process_single_choice_question($data = array()){
-        $counter = 0;
+        unset($data[0]);
         foreach($data as $sdata):
-            if($counter > 0 && isset($sdata[25]) && $sdata[25] != ''){
-                // Course
-                $course_id = $this->create_post($sdata[25], 'stm-courses', '');
+                if(isset($sdata[25]) && $sdata[25] != ''){
+                    // Course
+                    $course_id = $this->create_post($sdata[25], 'stm-courses', '');
+                }
                 
                 // Quiz
                 $quiz_id = $this->create_post($sdata[19], 'stm-quizzes', $sdata[20]);
@@ -429,14 +454,23 @@ class MICSV_Api
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
                 
-                // Course Curriculum 
-                $curriculum = array(
-                    $sdata[26], 
-                    $sdata[27], 
-                    $quiz_id
-                );
-                $curriculum = implode(',', $curriculum);
-                update_post_meta( $course_id, 'curriculum', $curriculum );
+                if(isset($sdata[25]) && $sdata[25] != ''){
+                    // Course Curriculum 
+                    $curriculum = array(
+                        $sdata[26], 
+                        $sdata[27], 
+                        $quiz_id
+                    );
+                    $curriculum = implode(',', $curriculum);
+                    update_post_meta( $course_id, 'curriculum', $curriculum );
+                }
+
+
+                // Link Question to Quiz 
+                $quiz_questions = get_post_meta( $quiz_id, 'questions', true );
+                $quiz_questions = $quiz_questions ? explode(',', $quiz_questions) : array();
+                array_push($quiz_questions, $question_id);
+                update_post_meta( $quiz_id, 'questions', implode(',', $quiz_questions) );
 
                 // Quiz duration_measure
                 $duration_measure = ($sdata[24] == 'Minutes') ? '' : strtolower($sdata[24]);
@@ -475,11 +509,14 @@ class MICSV_Api
                 update_post_meta( $question_id, 'type', $sdata[0] );
                 
                 // Questin Category
-                $q_cat = (array) get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
+                $q_cat = get_term_by( 'name', $sdata[2], 'stm_lms_question_taxonomy' );
                 if(!$q_cat){
                     $q_cat = wp_insert_term( $sdata[2], 'stm_lms_question_taxonomy');
                 }
-                $q_cat_id = $q_cat['term_id'];
+
+                
+                
+                $q_cat_id = $q_cat->term_id;
                 wp_set_post_terms( $question_id, array($q_cat_id), 'stm_lms_question_taxonomy' );
 
                 $answers = array();
@@ -498,9 +535,6 @@ class MICSV_Api
                 }
 
                 update_post_meta( $question_id, 'answers', $answers );
-
-            } 
-            $counter +=1;
         endforeach;
     }
 

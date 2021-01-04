@@ -66,6 +66,7 @@ class App extends React.Component {
         });
         const {csv_data, type} = this.state;
         this.fetchWP.post('save', {data: csv_data, type:type}).then(json => {
+            console.log(json);
             this.setState({
                 loader: false, 
                 upload_complete: true
