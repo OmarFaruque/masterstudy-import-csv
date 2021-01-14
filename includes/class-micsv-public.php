@@ -68,15 +68,26 @@ class MICSV_Public
 
         add_action('init', array($this, 'init'));
 
-        add_action('wp_head', array($this, 'testF'));
+        // add_action('wp_head', array($this, 'testF'));
     }
 
 
     public function testF(){
-        $answers = get_post_meta( 162, 'answers', true );
+        $answers = get_post_meta( 316, 'answers', true );
         echo 'Answers <br/><pre>';
         print_r($answers);
         echo '</pre>';
+        foreach($answers as $s){
+            echo 'get type: ' . gettype($s['isTrue']) . '<br/>';
+        }
+
+        $answers2 = get_post_meta( 320, 'answers', true );
+        echo 'Answers2 <br/><pre>';
+        print_r($answers2);
+        echo '</pre>';
+        foreach($answers2 as $s){
+            echo 'get type: ' . gettype($s['isTrue']) . '<br/>';
+        }
     }
 
     /** Handle Post Typ registration all here
