@@ -86,7 +86,7 @@ class MICSV_Api
     }
 
 
-    public function Generate_Featured_Image( $image_url, $post_id  ){
+    public function Generate_Featured_Image( $image_url, $post_id, $question = false  ){
         
         $upload_dir = wp_upload_dir();
         $image_data = file_get_contents($image_url);
@@ -108,8 +108,12 @@ class MICSV_Api
         require_once(ABSPATH . 'wp-admin/includes/image.php');
         $attach_data = wp_generate_attachment_metadata( $attach_id, $file );
         $res1= wp_update_attachment_metadata( $attach_id, $attach_data );
-        $res2= set_post_thumbnail( $post_id, $attach_id );
 
+        if(!$question){
+            $res2= set_post_thumbnail( $post_id, $attach_id );
+        }else{
+            $res2 = update_post_meta( $post_id, 'image', $attach_id );
+        }
 
     }
 
@@ -158,13 +162,34 @@ class MICSV_Api
 
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+
+                // Question Image 
+                if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
+                    // Check if already upload before 
+                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                   if($posts && isset($posts->ID)){
+                       update_post_meta( $question_id, 'image',  $posts->ID);
+                   }else{
+                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                   }
+               }else{
+                    update_post_meta( $question_id, 'image',  $sdata[3]);
+               }
+
+
                 
                 if(isset($sdata[16]) && $sdata[16] != ''){
+
+                    // Existing Curriculum  
+                    $ex_curriculum = get_post_meta( $course_id, 'curriculum', true );
+                    $ex_curriculum = ($ex_curriculum) ? explode(',',$ex_curriculum) : array();
+
                     // Course Curriculum 
-                    $curriculum = array();
-                        if($sdata[17] && !empty($sdata[17])) array_push($curriculum, $sdata[17]);
-                        if($sdata[18] && !empty($sdata[18])) array_push($curriculum, $sdata[18]);
-                        if($quiz_id) array_push($curriculum, $quiz_id);
+                    $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
+
+                    if($sdata[17] && !empty($sdata[17]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[17]);
+                    if($sdata[18] && !empty($sdata[18])) array_push($curriculum, $sdata[18]);
+                    if($quiz_id) array_push($curriculum, $quiz_id);
 
                     $curriculum = implode(',', $curriculum);
                     update_post_meta( $course_id, 'curriculum', $curriculum );
@@ -231,7 +256,7 @@ class MICSV_Api
                         
                         
                 $newArray = array(
-                            'text' => $sdata[4], 
+                            'text' => wp_slash( $sdata[4] ), 
                             'isTrue' => '0'
                 );
                 array_push($answers, $newArray);
@@ -262,14 +287,33 @@ class MICSV_Api
 
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+
+                // Question Image 
+                if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
+                    // Check if already upload before 
+                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                   if($posts && isset($posts->ID)){
+                       update_post_meta( $question_id, 'image',  $posts->ID);
+                   }else{
+                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                   }
+               }else{
+                    update_post_meta( $question_id, 'image',  $sdata[3]);
+               }
+
                 
 
                 if(isset($sdata[25]) && $sdata[25] != ''){
+                    // Existing Curriculum  
+                    $ex_curriculum = get_post_meta( $course_id, 'curriculum', true );
+                    $ex_curriculum = ($ex_curriculum) ? explode(',',$ex_curriculum) : array();
+
                     // Course Curriculum 
-                    $curriculum = array();
-                        if($sdata[26] && !empty($sdata[26])) array_push($curriculum, $sdata[26]);
-                        if($sdata[27] && !empty($sdata[27])) array_push($curriculum, $sdata[27]);
-                        if($quiz_id) array_push($curriculum, $quiz_id);
+                    $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
+
+                    if($sdata[26] && !empty($sdata[26]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[26]);
+                    if($sdata[27] && !empty($sdata[27])) array_push($curriculum, $sdata[27]);
+                    if($quiz_id) array_push($curriculum, $quiz_id);
                     $curriculum = implode(',', $curriculum);
                     update_post_meta( $course_id, 'curriculum', $curriculum );
                 }
@@ -339,9 +383,9 @@ class MICSV_Api
                         $correctAnswer = explode(',', $sdata[14]);
                         $explanationIndex = $i + 1;
                         $newArray = array(
-                            'text' => $sdata[$i], 
+                            'text' => wp_slash($sdata[$i]), 
                             'isTrue' => in_array($order, $correctAnswer) ? '1' : '0',
-                            'explain' => $sdata[$explanationIndex]
+                            'explain' => wp_slash($sdata[$explanationIndex])
                         );
                         array_push($answers, $newArray);
                     }
@@ -372,13 +416,34 @@ class MICSV_Api
 
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+
+
+                // Question Image 
+                if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
+                    // Check if already upload before 
+                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                   if($posts && isset($posts->ID)){
+                       update_post_meta( $question_id, 'image',  $posts->ID);
+                   }else{
+                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                   }
+               }else{
+                    update_post_meta( $question_id, 'image',  $sdata[3]);
+               }
+
+
                 
                 if(isset($sdata[29]) && $sdata[29] != ''){
+                    // Existing Curriculum  
+                    $ex_curriculum = get_post_meta( $course_id, 'curriculum', true );
+                    $ex_curriculum = ($ex_curriculum) ? explode(',',$ex_curriculum) : array();
+
                     // Course Curriculum 
-                    $curriculum = array();
-                        if($sdata[30] && !empty($sdata[30])) array_push($curriculum, $sdata[30]);
-                        if($sdata[31] && !empty($sdata[31])) array_push($curriculum, $sdata[31]);
-                        if($quiz_id) array_push($curriculum, $quiz_id);
+                    $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
+
+                    if($sdata[30] && !empty($sdata[30]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[30]);
+                    if($sdata[31] && !empty($sdata[31])) array_push($curriculum, $sdata[31]);
+                    if($quiz_id) array_push($curriculum, $quiz_id);
 
                     $curriculum = implode(',', $curriculum);
                     update_post_meta( $course_id, 'curriculum', $curriculum );
@@ -446,9 +511,9 @@ class MICSV_Api
                         $explanationIndex = $i + 2;
                         $questionIndex = $i + 1;
                         $newArray = array(
-                            'text' => $sdata[$i], 
+                            'text' => wp_slash($sdata[$i]), 
                             'isTrue' => '1',
-                            'explain' => $sdata[$explanationIndex]
+                            'explain' => wp_slash($sdata[$explanationIndex])
                         );
                         if(!empty($sdata[$questionIndex])) $newArray['question'] =  $sdata[$questionIndex];
                         array_push($answers, $newArray);
@@ -468,6 +533,9 @@ class MICSV_Api
      **/
     public function process_single_choice_question($data = array()){
         unset($data[0]);
+
+        $existing_curriculum = array();
+
         foreach($data as $sdata):
                 if(!empty($sdata[1])){
                     if(isset($sdata[25]) && $sdata[25] != ''){
@@ -480,11 +548,32 @@ class MICSV_Api
 
                     // Questions
                     $question_id = $this->create_post($sdata[1], 'stm-questions', '');
+
+                    // Question Image 
+                    if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
+                        // Check if already upload before 
+                       $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                       if($posts && isset($posts->ID)){
+                           update_post_meta( $question_id, 'image',  $posts->ID);
+                       }else{
+                           $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                       }
+                   }else{
+                        update_post_meta( $question_id, 'image',  $sdata[3]);
+                   }
+
+
                     
                     if(isset($sdata[25]) && $sdata[25] != ''){
+                        // Existing Curriculum  
+                        $ex_curriculum = get_post_meta( $course_id, 'curriculum', true );
+                        $ex_curriculum = ($ex_curriculum) ? explode(',',$ex_curriculum) : array();
+
                         // Course Curriculum 
-                        $curriculum = array();
-                        if($sdata[26] && !empty($sdata[26])) array_push($curriculum, $sdata[26]);
+                        $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
+
+
+                        if($sdata[26] && !empty($sdata[26]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[26]);
                         if($sdata[27] && !empty($sdata[27])) array_push($curriculum, $sdata[27]);
                         if($quiz_id) array_push($curriculum, $quiz_id);
                         
@@ -558,9 +647,9 @@ class MICSV_Api
                         if(!empty($sdata[$i])){
                             $explanationIndex = $i + 1;
                             $newArray = array(
-                                'text' => $sdata[$i], 
+                                'text' => wp_slash($sdata[$i]), 
                                 'isTrue' => (int)$sdata[14] != $order ? '0' : '1',
-                                'explain' => $sdata[$explanationIndex]
+                                'explain' => wp_slash($sdata[$explanationIndex])
                             );
                             array_push($answers, $newArray);
                         }
