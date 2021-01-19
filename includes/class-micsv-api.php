@@ -187,11 +187,13 @@ class MICSV_Api
                     // Course Curriculum 
                     $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
 
-                    if($sdata[17] && !empty($sdata[17]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[17]);
+                    if($sdata[17] && !empty($sdata[17])) array_push($curriculum, $sdata[17]);
                     if($sdata[18] && !empty($sdata[18])) array_push($curriculum, $sdata[18]);
                     if($quiz_id) array_push($curriculum, $quiz_id);
 
+                    $curriculum = array_unique($curriculum);
                     $curriculum = implode(',', $curriculum);
+                    
                     update_post_meta( $course_id, 'curriculum', $curriculum );
                 }
 
@@ -311,9 +313,11 @@ class MICSV_Api
                     // Course Curriculum 
                     $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
 
-                    if($sdata[26] && !empty($sdata[26]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[26]);
+                    if($sdata[26] && !empty($sdata[26])) array_push($curriculum, $sdata[26]);
                     if($sdata[27] && !empty($sdata[27])) array_push($curriculum, $sdata[27]);
                     if($quiz_id) array_push($curriculum, $quiz_id);
+
+                    $curriculum = array_unique($curriculum);
                     $curriculum = implode(',', $curriculum);
                     update_post_meta( $course_id, 'curriculum', $curriculum );
                 }
@@ -441,10 +445,11 @@ class MICSV_Api
                     // Course Curriculum 
                     $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
 
-                    if($sdata[30] && !empty($sdata[30]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[30]);
+                    if($sdata[30] && !empty($sdata[30])) array_push($curriculum, $sdata[30]);
                     if($sdata[31] && !empty($sdata[31])) array_push($curriculum, $sdata[31]);
                     if($quiz_id) array_push($curriculum, $quiz_id);
-
+                    
+                    $curriculum = array_unique($curriculum);
                     $curriculum = implode(',', $curriculum);
                     update_post_meta( $course_id, 'curriculum', $curriculum );
                 }
@@ -573,10 +578,11 @@ class MICSV_Api
                         $curriculum = count($ex_curriculum) > 0 ? $ex_curriculum : array();
 
 
-                        if($sdata[26] && !empty($sdata[26]) && count($ex_curriculum) <= 0) array_push($curriculum, $sdata[26]);
+                        if($sdata[26] && !empty($sdata[26])) array_push($curriculum, $sdata[26]);
                         if($sdata[27] && !empty($sdata[27])) array_push($curriculum, $sdata[27]);
                         if($quiz_id) array_push($curriculum, $quiz_id);
                         
+                        $curriculum = array_unique($curriculum);
                         $curriculum = implode(',', $curriculum);
                         update_post_meta( $course_id, 'curriculum', $curriculum );
                     }
