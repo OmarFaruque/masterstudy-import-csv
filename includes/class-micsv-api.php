@@ -163,19 +163,30 @@ class MICSV_Api
                 // Questions
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
 
-                // Question Image 
-                if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
-                    // Check if already upload before 
-                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
-                   if($posts && isset($posts->ID)){
-                       update_post_meta( $question_id, 'image',  $posts->ID);
-                   }else{
-                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
-                   }
-               }else{
-                    update_post_meta( $question_id, 'image',  $sdata[3]);
-               }
 
+                // Question Image 
+               $imgArray = array();
+               if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
+                   // Check if already upload before 
+                  $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                  if($posts && isset($posts->ID)){
+                       $image = wp_get_attachment_image_src($posts->ID, 'img-870-440');
+                       $imgArray['id'] = $posts->ID;
+                       $imgArray['url'] = $image[0];
+                  }else{
+                      $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                  }
+              }else{
+                  if(!empty($sdata[3])){
+                   $image = wp_get_attachment_image_src($sdata[3], 'img-870-440');
+                   $imgArray['id'] = $sdata[3];
+                   $imgArray['url'] = $image[0];
+                  }
+              }
+
+              if(count($imgArray) > 0){
+                   update_post_meta( $question_id, 'image',  $imgArray);
+              }
 
                 
                 if(isset($sdata[16]) && $sdata[16] != ''){
@@ -291,19 +302,30 @@ class MICSV_Api
                 $question_id = $this->create_post($sdata[1], 'stm-questions', '');
 
                 // Question Image 
+                $imgArray = array();
                 if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
-                    // Check if already upload before 
-                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
-                   if($posts && isset($posts->ID)){
-                       update_post_meta( $question_id, 'image',  $posts->ID);
-                   }else{
-                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
-                   }
-               }else{
-                    update_post_meta( $question_id, 'image',  $sdata[3]);
-               }
+                   // Check if already upload before 
+                  $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                  if($posts && isset($posts->ID)){
+                       $image = wp_get_attachment_image_src($posts->ID, 'img-870-440');
+                       $imgArray['id'] = $posts->ID;
+                       $imgArray['url'] = $image[0];
+                  }else{
+                      $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                  }
+                }else{
+                  if(!empty($sdata[3])){
+                   $image = wp_get_attachment_image_src($sdata[3], 'img-870-440');
+                   $imgArray['id'] = $sdata[3];
+                   $imgArray['url'] = $image[0];
+                  }
+                }
 
-                
+              if(count($imgArray) > 0){
+                   update_post_meta( $question_id, 'image',  $imgArray);
+              }
+
+
 
                 if(isset($sdata[25]) && $sdata[25] != ''){
                     // Existing Curriculum  
@@ -423,17 +445,28 @@ class MICSV_Api
 
 
                 // Question Image 
+                $imgArray = array();
                 if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
-                    // Check if already upload before 
-                   $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
-                   if($posts && isset($posts->ID)){
-                       update_post_meta( $question_id, 'image',  $posts->ID);
-                   }else{
-                       $this->Generate_Featured_Image($sdata[3], $question_id, true);
-                   }
-               }else{
-                    update_post_meta( $question_id, 'image',  $sdata[3]);
-               }
+                   // Check if already upload before 
+                  $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
+                  if($posts && isset($posts->ID)){
+                       $image = wp_get_attachment_image_src($posts->ID, 'img-870-440');
+                       $imgArray['id'] = $posts->ID;
+                       $imgArray['url'] = $image[0];
+                  }else{
+                      $this->Generate_Featured_Image($sdata[3], $question_id, true);
+                  }
+                }else{
+                  if(!empty($sdata[3])){
+                   $image = wp_get_attachment_image_src($sdata[3], 'img-870-440');
+                   $imgArray['id'] = $sdata[3];
+                   $imgArray['url'] = $image[0];
+                  }
+                }
+
+              if(count($imgArray) > 0){
+                   update_post_meta( $question_id, 'image',  $imgArray);
+              }
 
 
                 
@@ -554,18 +587,34 @@ class MICSV_Api
                     // Questions
                     $question_id = $this->create_post($sdata[1], 'stm-questions', '');
 
+
+
+
+
                     // Question Image 
+                    $imgArray = array();
                     if (filter_var($sdata[3], FILTER_VALIDATE_URL)) { 
                         // Check if already upload before 
                        $posts = get_page_by_title( basename($sdata[3]), OBJECT, 'attachment' );
                        if($posts && isset($posts->ID)){
-                           update_post_meta( $question_id, 'image',  $posts->ID);
+                            $image = wp_get_attachment_image_src($posts->ID, 'img-870-440');
+                            $imgArray['id'] = $posts->ID;
+                            $imgArray['url'] = $image[0];
                        }else{
                            $this->Generate_Featured_Image($sdata[3], $question_id, true);
                        }
                    }else{
-                        update_post_meta( $question_id, 'image',  $sdata[3]);
+                       if(!empty($sdata[3])){
+                        $image = wp_get_attachment_image_src($sdata[3], 'img-870-440');
+                        $imgArray['id'] = $sdata[3];
+                        $imgArray['url'] = $image[0];
+                       }
                    }
+
+                   if(count($imgArray) > 0){
+                        update_post_meta( $question_id, 'image',  $imgArray);
+                   }
+                   
 
 
                     
